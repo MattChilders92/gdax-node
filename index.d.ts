@@ -357,4 +357,35 @@ declare module 'gdax' {
         connect(): void;
         disconnect(): void;
     }
+
+    export class OrderbookSync extends WebsocketClient {
+        constructor(
+            productIDs,
+            apiURI = 'https://api.gdax.com',
+            websocketURI = 'wss://ws-feed.gdax.com',
+            auth = null
+        );
+        loadOrderbook(productID: string[]): void;
+    }
+
+    export class Orderbook {
+        state(book): Book;
+        get(orderId);
+        add(order);
+        remove(orderId);
+        match(match);
+        change(change);
+    }
+
+    export class Book {
+        bid: Order;
+        ask: Order;
+    }
+
+    export class Order {
+        id: string;
+        side: string;
+        price: number;
+        size: number;
+    }
 }
