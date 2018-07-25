@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import * as request from 'request';
 import { Readable } from 'stream';
-import { OrderInfo } from "gdax";
+import { Orderbook, OrderInfo, WebsocketClient } from 'gdax';
 
 declare module 'gdax' {
     export type HttpResponse = request.Response;
@@ -359,14 +359,16 @@ declare module 'gdax' {
         disconnect(): void;
     }
 
+
     export class OrderbookSync extends WebsocketClient {
         constructor(
-            productIDs,
-            apiURI = 'https://api.gdax.com',
-            websocketURI = 'wss://ws-feed.gdax.com',
-            auth = null
+            productIDs: string[],
+            apiURI: string,
+            websocketURI: string,
+            auth: {key: string, secret: string, passphrase: string}
         );
-        loadOrderbook(productID: string[]): void;
+        loadOrderbook(productID: string): void;
+        books: Orderbook[];
     }
 
     export class Orderbook {
