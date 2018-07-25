@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import * as request from 'request';
 import { Readable } from 'stream';
+import { OrderInfo } from "gdax";
 
 declare module 'gdax' {
     export type HttpResponse = request.Response;
@@ -378,14 +379,7 @@ declare module 'gdax' {
     }
 
     export class Book {
-        bid: Order;
-        ask: Order;
-    }
-
-    export class Order {
-        id: string;
-        side: string;
-        price: number;
-        size: number;
+        bid: OrderInfo[];
+        ask: OrderInfo[];
     }
 }
