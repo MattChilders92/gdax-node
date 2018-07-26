@@ -1,10 +1,11 @@
 import { EventEmitter } from 'events';
 import * as request from 'request';
 import { Readable } from 'stream';
-import { Orderbook, OrderInfo, WebsocketClient } from 'gdax';
+import { OrderInfo } from "gdax";
+import { Observable } from 'rxjs';
 
 declare module 'gdax' {
-    export type HttpResponse = request.Response;
+  export type HttpResponse = request.Response;
 
     export type callback<T> = (err: any, response: HttpResponse, data: T) => void;
 
@@ -151,9 +152,9 @@ declare module 'gdax' {
         response: HttpResponse;
         data?: any;
     }
-    
+
     export interface ClientOptions {
-        timeout?: number;   
+        timeout?: number;
     }
 
     export class PublicClient {
@@ -293,6 +294,20 @@ declare module 'gdax' {
             product_id: string
             changes: [string, string, string][] // [side, price, new size]
         }
+        export type Open = {
+            type: 'open'
+            price: string
+            reason: string
+            product_id: string
+            changes: [string, string, string][] // [side, price, new size]
+        }
+        export type Ticker = {
+            type: 'ticker'
+            price: string
+            reason: string
+            product_id: string
+            changes: [string, string, string][] // [side, price, new size]
+        }
         export type Received = {
             type: 'received'
             time: string
@@ -324,12 +339,14 @@ declare module 'gdax' {
         }
         // Add as necessary. There are still Opens, Dones, Changes, and some other things
     }
-    export type WebsocketMessage =
+    export type WebsocketMessages =
         WebsocketMessage.Heartbeat
         | WebsocketMessage.L2Snapshot
         | WebsocketMessage.L2Update
         | WebsocketMessage.Received
         | WebsocketMessage.Match
+        | WebsocketMessage.Open
+        | WebsocketMessage.Ticker
         // Add as necessary.
 
 
@@ -350,7 +367,7 @@ declare module 'gdax' {
             auth?: WebsocketAuthentication,
             { channels }?: WebsocketClientOptions );
 
-        on(event: 'message', eventHandler: (data: WebsocketMessage) => void): this;
+        on(event: 'message', eventHandler: (data: WebsocketMessages) => void): this;
         on(event: 'error', eventHandler: (err:any) => void): this;
         on(event: 'open', eventHandler: () => void): this;
         on(event: 'close', eventHandler: () => void): this;
@@ -359,13 +376,13 @@ declare module 'gdax' {
         disconnect(): void;
     }
 
-
     export class OrderbookSync extends WebsocketClient {
         constructor(
             productIDs: string[],
             apiURI: string,
             websocketURI: string,
-            auth: {key: string, secret: string, passphrase: string}
+            auth?: {key: string, secret: string, passphrase: string},
+            channels?: (string | { name: string, product_ids: string[]})[]
         );
         loadOrderbook(productID: string): void;
         books: Orderbook[];
@@ -373,6 +390,7 @@ declare module 'gdax' {
 
     export class Orderbook {
         state(book): Book;
+        book$: Observable<Book>;
         get(orderId);
         add(order);
         remove(orderId);
@@ -381,7 +399,7 @@ declare module 'gdax' {
     }
 
     export class Book {
-        bid: OrderInfo[];
-        ask: OrderInfo[];
+        bids: OrderInfo[];
+        asks: OrderInfo[];
     }
 }
