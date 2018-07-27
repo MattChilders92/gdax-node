@@ -391,6 +391,8 @@ declare module 'gdax' {
     export class Orderbook {
         state(book): Book;
         book$: Observable<Book>;
+        grouping: number;
+        changeGrouping(delta: number, productId: string): number;
         get(orderId);
         add(order);
         remove(orderId);
