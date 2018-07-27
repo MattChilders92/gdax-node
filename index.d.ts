@@ -384,6 +384,7 @@ declare module 'gdax' {
             auth?: {key: string, secret: string, passphrase: string},
             channels?: (string | { name: string, product_ids: string[]})[]
         );
+        changeGrouping(delta: number, productId: string): number;
         loadOrderbook(productID: string): void;
         books: Orderbook[];
     }
@@ -392,7 +393,6 @@ declare module 'gdax' {
         state(book): Book;
         book$: Observable<Book>;
         grouping: number;
-        changeGrouping(delta: number, productId: string): number;
         get(orderId);
         add(order);
         remove(orderId);
